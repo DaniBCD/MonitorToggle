@@ -1,12 +1,13 @@
 # MonitorToggle 🖥️↔️🖥️
 
-Pequeña app que vive en la **system tray** de Windows y alterna entre 1 y 2 monitores con un clic.
+Pequeña app que vive en la **system tray** de Windows y alterna entre 1 y 2 monitores con un clic o un atajo de teclado.
 
 ## Características
 
 - **Click izquierdo** o menú → alterna el modo
+- **Atajo global `Ctrl+Alt+M`** → alterna desde cualquier monitor sin necesidad de buscar el icono en la tray
 - **1 monitor → 2**: activa el segundo monitor en modo "extender"
-- **2 monitores → 1**: apaga el monitor donde NO está el cursor
+- **2 monitores → 1**: conserva el monitor donde está el cursor y apaga el otro
   - Si el cursor está en el monitor **primario** → `DisplaySwitch /internal`
   - Si el cursor está en un monitor **secundario** → `DisplaySwitch /external`
 - Icono en la tray cambia visualmente según el modo activo

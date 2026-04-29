@@ -2,8 +2,8 @@
 Monitor Toggle Tray App
 -----------------------
 Vive en la system tray de Windows.
-Click izquierdo o menú → alterna entre 1 monitor y 2 monitores.
-En modo 1 monitor, usa siempre el monitor desde el que se hizo clic.
+Click izquierdo, menú o Ctrl+Alt+M → alterna entre 1 y 2 monitores.
+En modo 1 monitor, conserva siempre el monitor donde está el cursor.
 """
 
 import sys
@@ -81,6 +81,35 @@ def get_cursor_monitor() -> int:
         return monitors.index(hmonitor)
     except ValueError:
         return 0
+
+
+# ── Hotkey global (Ctrl+Alt+M) ───────────────────────────────────────────────
+
+HOTKEY_ID = 1
+MOD_CTRL = 0x0002
+MOD_ALT  = 0x0001
+VK_M     = 0x4D
+WM_HOTKEY = 0x0312
+
+
+def _hotkey_listener(toggle_fn):
+    """
+    Registra Ctrl+Alt+M como hotkey global y escucha el mensaje en un bucle.
+    Se ejecuta en un hilo daemon — muere automáticamente al cerrar la app.
+    """
+    user32 = ctypes.windll.user32
+
+    if not user32.RegisterHotKey(None, HOTKEY_ID, MOD_CTRL | MOD_ALT, VK_M):
+        # Si falla (ej. otra app ya usa el atajo), lo dejamos pasar en silencio.
+        return
+
+    msg = ctypes.wintypes.MSG()
+    try:
+        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) != 0:
+            if msg.message == WM_HOTKEY and msg.wParam == HOTKEY_ID:
+                toggle_fn()
+    finally:
+        user32.UnregisterHotKey(None, HOTKEY_ID)
 
 
 # ── Estado global ────────────────────────────────────────────────────────────
@@ -205,6 +234,8 @@ def main():
             default=True,
         ),
         pystray.Menu.SEPARATOR,
+        pystray.MenuItem("Atajo: Ctrl+Alt+M", None, enabled=False),
+        pystray.Menu.SEPARATOR,
         pystray.MenuItem("Salir", on_quit),
     )
 
@@ -216,6 +247,15 @@ def main():
     )
     icon.on_click = on_click  # click izquierdo
     state.icon = icon
+
+    # Lanzar listener de hotkey global en hilo daemon
+    hotkey_thread = threading.Thread(
+        target=_hotkey_listener,
+        args=(state.toggle,),
+        daemon=True,
+    )
+    hotkey_thread.start()
+
     icon.run()
 
 
