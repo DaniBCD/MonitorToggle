@@ -35,7 +35,7 @@ Si quieres que se inicie automáticamente al encender el PC:
 - Python 3.10+
 
 ### Construir desde el código fuente
-1. Clona este repositorio: `git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git`
+1. Clona este repositorio: `git clone https://github.com/DaniBCD/MonitorToggle.git`
 2. Ejecuta `install.bat`. Este script automáticamente:
    - Instalará las dependencias necesarias (`pystray`, `pillow`, `pyinstaller`).
    - Compilará el ejecutable.
